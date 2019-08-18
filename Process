@@ -1,0 +1,113 @@
+static void Processa(Process _p, int _CY, int _CX, string[] _DADOS, Regex _RGXENTER, int _CY2, int _CX2, Regex _RGXTAB, string _CODE, string _PRECIO)
+        {
+            MandaProcessoParaFrente(_p);
+
+            
+
+            //// Read the file and display it line by line.  
+            //System.IO.StreamReader file = new System.IO.StreamReader(@"temp1.txt");
+            //while ((line = file.ReadLine()) != null)
+            //{
+            //    if (line.Contains("Enter"))
+            //    {
+            //        SendEnter(_DADOS, _RGXENTER);
+            //    }
+            //    else if (line.Contains("Tab"))
+            //    {
+            //        SendTab(_DADOS, _RGXTAB);
+            //    }
+            //}
+
+            //file.Close();
+
+            var lines = File.ReadAllLines(@"Steps.txt");
+            Regex rgxdigitoscod = new Regex(@"^\d{9}$"); // verifica as variáveis com nove dígitos 
+            Regex rgxdigitospre = new Regex(@"^\d{2}$");
+
+            System.IO.StreamReader file = new System.IO.StreamReader(@"Steps.txt");
+
+            //foreach (string c in lines)
+            //{
+            //    if (c.Contains("Tab"))
+            //    {
+            //        Console.WriteLine(" Tab ");
+            //        SendKeys.SendWait("{TAB}");
+
+            //        //SendTab(_DADOS, _RGXTAB);
+            //    }
+            //}
+            //file.Close();
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                var fields = lines[i].Split(' ');
+
+                if (lines[i].Contains("Tab"))
+                {
+                    SendKeys.SendWait("{TAB}");
+                    //SendTab(_DADOS, _RGXTAB);
+                }
+
+                if (lines[i].Contains(','))
+                {
+                    AutoRato(_CY, _CX);
+
+                    IntPtr handle = _p.MainWindowHandle;
+
+                    handle.ToInt32();
+
+                    IntPtr notepadTextbox = FindWindowEx(_p.MainWindowHandle, IntPtr.Zero, "edit", null);
+                    int length = SendMessageGetTextLength(notepadTextbox, WM_GETTEXTLENGTH, IntPtr.Zero, IntPtr.Zero);
+                    //Console.Write(lines[i] + "\n");
+
+                    if (rgxdigitoscod.IsMatch(lines[i + 1]))
+                    {
+                        //Console.Write(lines[i+1] + "\n");
+
+                        ColaCode(_CODE);
+                        SendKeys.SendWait("~");
+                        //i++; //Incrementa a linha seguinte e verifica se é uma tecla
+
+                        //Console.Write(lines[i+2]);
+
+                        //if (lines[i + 2].Contains("Enter"))
+                        //{
+                        //    SendKeys.SendWait("~");
+                        //    //SendEnter(_DADOS, _RGXENTER);
+                        //}
+
+                        AutoRato(_CY2, _CX2);
+                        AutoRato(_CY2, _CX2);
+
+                        SendKeys.SendWait("^{a}");
+                        ColaPrecio(_PRECIO);
+                    }
+
+                }
+
+                if (lines[i].Contains("Enter"))
+                {
+                    SendKeys.SendWait("~");
+                    //SendEnter(_DADOS, _RGXENTER);
+                }
+                SendKeys.SendWait("{TAB}"); //Corrige Bug
+                SendKeys.SendWait("~");
+
+                //if (rgxdigitospre.IsMatch(lines[i]))
+                //{
+                //    SendKeys.SendWait("^{a}");
+                //    ColaPrecio(_PRECIO);
+                //}
+
+                //if (lines[i].Contains("Enter"))
+                //{
+                //    SendKeys.SendWait("~");
+                //    //SendEnter(_DADOS, _RGXENTER);
+                //}
+
+                //else if (lines[i].Contains("Tab"))
+                //{
+                //    SendTab(_DADOS, _RGXTAB);
+                //}
+            }
+        }
